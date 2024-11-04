@@ -15,8 +15,6 @@ export function Weather() {
   const weather: WeatherData = state?.weather
   const city: GeoCityData = state?.city
 
-  console.log('Weather', state, position)
-
   useEffect(() => {
     if (typeof window !== "undefined") {
       window?.navigator?.geolocation?.getCurrentPosition((newPosition) => {
