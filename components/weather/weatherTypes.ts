@@ -133,6 +133,7 @@ export type WeatherData = {
 }
 
 export type FormState = {
-  "weather": WeatherData,
-  "city": GeoCityData
+  "weather": WeatherData | undefined,
+  "city": GeoCityData | undefined,
+  "error": string | undefined,
 }

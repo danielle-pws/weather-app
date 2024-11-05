@@ -2,18 +2,21 @@
 
 import { useActionState, useEffect, useState } from 'react'
 import { weatherAction } from '@/components/weather/actions'
-import { FormState, GeoCityData, WeatherData } from '@/components/weather/weatherTypes'
+import { FormState } from '@/components/weather/weatherTypes'
 import { WeatherCurrent } from '@/components/weather/WeatherCurrent'
 import { WeatherHourly } from '@/components/weather/WeatherHourly'
 
-const initialState: FormState | undefined = undefined
+const initialState: FormState = {
+  weather: undefined,
+  city: undefined,
+  error: undefined
+}
 
 export function Weather() {
   const [state, formAction, isPending] = useActionState(weatherAction, initialState)
   const [isReady, setReady] = useState(false)
   const [position, setPosition] = useState<GeolocationPosition>()
-  const weather: WeatherData = state?.weather
-  const city: GeoCityData = state?.city
+  const {weather, city, error} = state
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -42,6 +45,7 @@ export function Weather() {
         <input type="hidden" id="lat" name="lat" defaultValue={position?.coords?.latitude || ''}/>
         <input type="hidden" id="lon" name="lon" defaultValue={position?.coords?.longitude || ''}/>
         <button
+          type='submit'
           className="text-white mt-4 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           disabled={isPending && isReady}
         >
@@ -49,11 +53,16 @@ export function Weather() {
         </button>
       </form>
 
-      <h2 className='font-bold font-3xl pt-5 pb-3'>{city?.name}{city?.state ? `, ${city?.state}` : ''}</h2>
-      <div>
-        <WeatherCurrent current={weather?.current}/>
-        <WeatherHourly hourly={weather?.hourly} />
-      </div>
+      {error ? (
+        <h3 className='font-normal font-1xl pt-5 pb-3'>{error}</h3>
+      ) : (
+        <><h2 className='font-bold font-3xl pt-5 pb-3'>{city?.name}{city?.state ? `, ${city?.state}` : ''}</h2>
+          <div>
+            <WeatherCurrent current={weather?.current}/>
+            <WeatherHourly hourly={weather?.hourly}/>
+          </div>
+        </>
+      )}
     </div>
   )
 }

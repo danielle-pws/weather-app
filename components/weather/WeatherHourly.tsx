@@ -33,7 +33,7 @@ function WeatherHour({hwd}: {hwd: HourlyWeatherData} ) {
   )
 }
 
-export function WeatherHourly ({ hourly }: { hourly: HourlyWeatherData[]}) {
+export function WeatherHourly ({ hourly }: { hourly: HourlyWeatherData[] | undefined}) {
   if (!hourly) {
     return null
   }

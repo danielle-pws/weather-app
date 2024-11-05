@@ -1,7 +1,7 @@
 import { CurrentWeatherData } from '@/components/weather/weatherTypes'
 import Image from 'next/image'
 
-export function WeatherCurrent({current}: {current: CurrentWeatherData}) {
+export function WeatherCurrent({current}: {current: CurrentWeatherData | undefined}) {
   if (!current) {
     return null
   }

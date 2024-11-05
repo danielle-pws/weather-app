@@ -42,13 +42,20 @@ async function fetchLocationName(lat: number, lon: number) {
   return await response.json();
 }
 
-export async function weatherAction(prevState: FormState | undefined, formData: FormData) {
+export async function weatherAction(prevState: FormState, formData: FormData) {
   // use some hidden fields to get lat/long from browser api - form has button to fill these fields
   // otherwise use https://openweathermap.org/api/geocoding-api to convert city or zip code to lat/long
+  let retVal: FormState = {
+    "weather": undefined,
+    "city": undefined,
+    "error": 'Error occurred'
+  }
+
   const latString = formData.get('lat')?.toString()
   const lonString= formData.get('lon')?.toString()
   const name = formData.get('name')?.toString()
   const zipData = zipFilter(name)
+  let errorMessage: string | undefined = undefined
 
   let lat: number | undefined = latString ? +latString : undefined
   let lon: number | undefined = lonString ? +lonString : undefined
@@ -56,23 +63,46 @@ export async function weatherAction(prevState: FormState | undefined, formData: 
   if (zipData) {
     const geoDataResponse = await fetch(`http://api.openweathermap.org/geo/1.0/zip?zip=${zipData.zip},${zipData.countryCode}&appid=${FREE_APIKEY}`)
     const geoData: GeoZipData = await geoDataResponse.json()
-    lat = geoData.lat
-    lon = geoData.lon
+    if (geoData) {
+      lat = geoData.lat
+      lon = geoData.lon
+    } else {
+      errorMessage = 'Unable to find city by Zip/Postal Code'
+    }
   } else if(name) {
     // this search doesn't deal with short names for provinces etc.
     // also will return all London's not just the one in the province / country
     // TODO fix search to return the city that matches the one requested not the first one.
     const geoDataResponse = await fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${name}&limit=5&appid=${FREE_APIKEY}`)
     const geoData: GeoCityData[] = await geoDataResponse.json()
-    lat = geoData[0].lat
-    lon = geoData[0].lon
-  }
-
-  if (lat && lon) {
-    const [weatherData, locationData] = await Promise.all([fetchWeather(lat, lon), fetchLocationName(lat, lon)])
-    return {
-      "weather": weatherData,
-      "city": locationData[0]
+    if (geoData.length > 0) {
+      lat = geoData[0]?.lat
+      lon = geoData[0]?.lon
+    } else {
+      errorMessage = 'Unable to find city by Name'
     }
   }
+
+  if (!errorMessage && lat && lon) {
+    const [weatherData, locationData] = await Promise.all([fetchWeather(lat, lon), fetchLocationName(lat, lon)])
+    if (weatherData && locationData) {
+      retVal = {
+        "weather": weatherData,
+        "city": locationData[0],
+        "error": undefined
+      }
+    } else {
+      errorMessage = 'Error loading weather data'
+    }
+  }
+
+  if (errorMessage) {
+    retVal = {
+      "weather": undefined,
+      "city": undefined,
+      "error": errorMessage
+    }
+  }
+
+  return retVal
 }
