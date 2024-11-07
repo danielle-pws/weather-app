@@ -39,7 +39,7 @@ export function WeatherHourly ({ hourly }: { hourly: HourlyWeatherData[] | undef
   }
 
   return (
-    <div className='flex flex-row gap-2 items-center w-screen max-w-3xl overflow-auto'>
+    <div className='hourly flex flex-row gap-2 items-center w-screen max-w-3xl overflow-auto'>
       {hourly.map(hour => (
         <WeatherHour key={hour.dt} hwd={hour} />
       ))}

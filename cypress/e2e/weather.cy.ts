@@ -126,4 +126,24 @@ describe('Navigation', () => {
     // The new page should contain an h2 containing 'Kelowna'
     cy.get('h2').should('contain', 'Kelowna, British Columbia')
   })
+
+  it('weather show current Weather, Hourly Weather and Pollution Data', () => {
+    // Start from the index page
+    cy.visit('/')
+
+    cy.get('input[name*="name"]').type('V1X 4T6')
+
+    // Find a button with an type attribute containing "submit" and click it
+    cy.get('button[type*="submit"]:not([disabled])', { timeout: 10000 }).click()
+
+    // The new page should contain an h2 containing 'Kelowna'
+    cy.get('h2').should('contain', 'Kelowna')
+    // The new page should contain an h2 containing 'Kelowna'
+    cy.get('.current').should('contain', 'Feels Like')
+    // The new page should contain an h2 containing 'Kelowna'
+    cy.get('.pollution').should('contain', 'Air Quality Index')
+    // The new page should contain an h2 containing 'Kelowna'
+    cy.get('.hourly').should('contain', 'POP')
+  })
+
 })

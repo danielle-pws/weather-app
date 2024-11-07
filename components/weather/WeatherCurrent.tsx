@@ -10,7 +10,7 @@ export function WeatherCurrent({current}: {current: CurrentWeatherData | undefin
   const iconSrc = `https://openweathermap.org/img/wn/${weatherDetails.icon}@2x.png`
 
   return (
-    <div className='my-2 border-blue-800 border-2 rounded-3xl max-w-sm bg-blue-100 flex flex-row gap-6 items-center p-2'>
+    <div className='current my-2 border-blue-800 border-2 rounded-3xl max-w-sm bg-blue-100 flex flex-row gap-6 items-center p-2'>
       <div>
         <Image
           src={iconSrc}

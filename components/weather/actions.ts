@@ -42,12 +42,18 @@ async function fetchLocationName(lat: number, lon: number) {
   return await response.json();
 }
 
+async function fetchPollution(lat: number, lon: number) {
+  const response = await fetch(`http://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=${lat}&lon=${lon}&limit=1&appid=${FREE_APIKEY}`)
+  return await response.json();
+}
+
 export async function weatherAction(prevState: FormState, formData: FormData) {
   // use some hidden fields to get lat/long from browser api - form has button to fill these fields
   // otherwise use https://openweathermap.org/api/geocoding-api to convert city or zip code to lat/long
   let retVal: FormState = {
     "weather": undefined,
     "city": undefined,
+    "pollution": undefined,
     "error": 'Error occurred'
   }
 
@@ -84,11 +90,13 @@ export async function weatherAction(prevState: FormState, formData: FormData) {
   }
 
   if (!errorMessage && lat && lon) {
-    const [weatherData, locationData] = await Promise.all([fetchWeather(lat, lon), fetchLocationName(lat, lon)])
+    // TODO update this to be allSettled
+    const [weatherData, locationData, pollutionData] = await Promise.all([fetchWeather(lat, lon), fetchLocationName(lat, lon), fetchPollution(lat,lon)])
     if (weatherData && locationData) {
       retVal = {
         "weather": weatherData,
         "city": locationData[0],
+        "pollution": pollutionData,
         "error": undefined
       }
     } else {
@@ -100,6 +108,7 @@ export async function weatherAction(prevState: FormState, formData: FormData) {
     retVal = {
       "weather": undefined,
       "city": undefined,
+      "pollution": undefined,
       "error": errorMessage
     }
   }

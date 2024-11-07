@@ -5,10 +5,12 @@ import { weatherAction } from '@/components/weather/actions'
 import { FormState } from '@/components/weather/weatherTypes'
 import { WeatherCurrent } from '@/components/weather/WeatherCurrent'
 import { WeatherHourly } from '@/components/weather/WeatherHourly'
+import { Pollution } from '@/components/weather/Pollution'
 
 const initialState: FormState = {
   weather: undefined,
   city: undefined,
+  pollution: undefined,
   error: undefined
 }
 
@@ -16,7 +18,7 @@ export function Weather() {
   const [state, formAction, isPending] = useActionState(weatherAction, initialState)
   const [isReady, setReady] = useState(false)
   const [position, setPosition] = useState<GeolocationPosition>()
-  const {weather, city, error} = state
+  const {weather, city, pollution, error} = state
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -58,7 +60,10 @@ export function Weather() {
       ) : (
         <><h2 className='font-bold font-3xl pt-5 pb-3'>{city?.name}{city?.state ? `, ${city?.state}` : ''}</h2>
           <div>
-            <WeatherCurrent current={weather?.current}/>
+            <div className='flex flex-row justify-around'>
+              <WeatherCurrent current={weather?.current}/>
+              <Pollution pollution={pollution}/>
+            </div>
             <WeatherHourly hourly={weather?.hourly}/>
           </div>
         </>
